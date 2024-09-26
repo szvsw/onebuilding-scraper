@@ -18,7 +18,7 @@ async def get_root(client: httpx.AsyncClient):
         client (httpx.AsyncClient): The HTTP client.
 
     Returns:
-        list[str]: A list of regions extracted from the root elements.
+        regions (list[str]): A list of regions extracted from the root elements.
     """
     home = await client.get("/default.html")
     soup = BeautifulSoup(home.content, "html.parser")
@@ -90,7 +90,7 @@ def make_row_dict(path: str):
         path (str): The path to the file.
 
     Returns:
-        dict[str, int | bool | float]: A dictionary containing the following information:
+        metadata (dict[str, int | bool | float]): A dictionary containing the following information:
             - name (str): The name of the file.
             - location (str): The location in the format "POINT(lon lat)".
             - path (str): The path to the file.
@@ -156,7 +156,7 @@ async def generate_paths(client: httpx.AsyncClient):
         client (httpx.AsyncClient): An instance of httpx.AsyncClient.
 
     Returns:
-        list[str]: A list of file paths.
+        files (list[str]): A list of file paths.
     """
     regions = await get_root(client)
     subregion_promises = [get_subregions(region, client) for region in regions]
