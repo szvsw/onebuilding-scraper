@@ -47,7 +47,7 @@ jobs:
         run: poetry run pyright
 
       - name: Run tests
-        run: poetry run pytest tests --cov --cov-config=pyproject.toml --cov-report=xml
+        run: poetry run pytest tests
 
   check-docs:
     runs-on: ubuntu-latest
