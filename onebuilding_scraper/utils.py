@@ -18,13 +18,14 @@ async def get_root(client: httpx.AsyncClient):
         client (httpx.AsyncClient): The HTTP client.
 
     Returns:
-        list: A list of regions extracted from the root elements.
+        list[str]: A list of regions extracted from the root elements.
     """
     home = await client.get("/default.html")
     soup = BeautifulSoup(home.content, "html.parser")
     # find all a tags with hrefs that start with "WMO_REGION_"
     regions = list({
-        a["href"] for a in soup.find_all("a", href=re.compile(r"WMO_Region_"))
+        cast(str, a["href"])
+        for a in soup.find_all("a", href=re.compile(r"WMO_Region_"))
     })
     return regions
 
@@ -89,7 +90,7 @@ def make_row_dict(path: str):
         path (str): The path to the file.
 
     Returns:
-        dict: A dictionary containing the following information:
+        dict[str, int | bool | float]: A dictionary containing the following information:
             - name (str): The name of the file.
             - location (str): The location in the format "POINT(lon lat)".
             - path (str): The path to the file.
@@ -190,11 +191,8 @@ async def download_zip_and_unzip(
         client (httpx.AsyncClient): The HTTP client to use for the request.
 
     Returns:
-        Tuple[int, Union[str, Dict[str, Any]]]: A tuple containing the status code and the result.
-            - If successful, the status code is 0 and the result is the path to the extracted EPW file.
-            - If an error occurs during download, the status code is -1 and the result is the error message.
-            - If an error occurs during extraction, the status code is -2 and the result is the error message.
-            - If an error occurs while processing the EPW file, the status code is -3 and the result is the error message.
+        status_code (int): The status code.
+        out_epw (Path | Exception): The path to the extracted EPW file or an exception if an error occurred.
     """
     out_zip = output_dir / Path(file)
     out_folder = out_zip.parent / out_zip.stem
